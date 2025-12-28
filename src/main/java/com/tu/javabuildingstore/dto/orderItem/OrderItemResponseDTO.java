@@ -1,4 +1,13 @@
 package com.tu.javabuildingstore.dto.orderItem;
 
-public record OrderItemResponseDTO() {
+import java.math.BigDecimal;
+
+public record OrderItemResponseDTO(
+        Long productId,
+        String productName,
+        BigDecimal unitPrice,
+        Integer quantity,
+        BigDecimal subtotal
+) {
 }
+
