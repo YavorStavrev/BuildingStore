@@ -10,6 +10,7 @@ import com.tu.javabuildingstore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,30 @@ public class ProductService {
         product.setStockQuantity(dto.stockQuantity());
         Product saved = productRepository.save(product);
         return productMapper.toDto(saved);
+    }
+
+    public List<ProductResponseDTO> listFiltered(String categoryName,
+                                                 BigDecimal minPrice,
+                                                 BigDecimal maxPrice,
+                                                 Boolean discounted,
+                                                 String keyword) {
+        List<Product> products;
+
+        if (categoryName != null && !categoryName.isBlank()) {
+            products = productRepository.findByCategoryName(categoryName);
+        } else if (minPrice != null && maxPrice != null) {
+            products = productRepository.findByPriceRange(minPrice, maxPrice);
+        } else if (Boolean.TRUE.equals(discounted)) {
+            products = productRepository.findDiscountedProducts();
+        } else if (keyword != null && !keyword.isBlank()) {
+            products = productRepository.searchByName(keyword);
+        } else {
+            products = productRepository.findAll();
+        }
+
+        return products.stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     // --- Helper Method ---
