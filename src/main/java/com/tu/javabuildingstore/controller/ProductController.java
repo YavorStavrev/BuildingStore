@@ -29,7 +29,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProduct(id));
     }
 
-    @GetMapping
+    @GetMapping("/filtered")
     public ResponseEntity<List<ProductResponseDTO>> listAll(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) BigDecimal minPrice,

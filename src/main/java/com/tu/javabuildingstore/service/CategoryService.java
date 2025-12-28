@@ -3,6 +3,7 @@ package com.tu.javabuildingstore.service;
 
 import com.tu.javabuildingstore.dto.category.CategoryRequestDTO;
 import com.tu.javabuildingstore.dto.category.CategoryResponseDTO;
+import com.tu.javabuildingstore.exception.ResourceNotFoundException;
 import com.tu.javabuildingstore.mapper.CategoryMapper;
 import com.tu.javabuildingstore.model.Category;
 import com.tu.javabuildingstore.repository.CategoryRepository;
