@@ -1,5 +1,7 @@
 package com.tu.javabuildingstore.dto.category;
 
+import com.tu.javabuildingstore.model.Category;
+
 public record CategoryResponseDTO(
         Long id,
         String name,

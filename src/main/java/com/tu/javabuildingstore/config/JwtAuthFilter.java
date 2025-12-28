@@ -1,5 +1,6 @@
 package com.tu.javabuildingstore.config;
 
+import com.tu.javabuildingstore.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
