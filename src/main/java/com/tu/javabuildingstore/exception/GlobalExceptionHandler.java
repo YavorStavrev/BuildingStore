@@ -23,7 +23,12 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-   
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ex.getBody();
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        return problemDetail;
+    }
 
     // For @Valid (@RequestBody requestDTO)
     @ExceptionHandler(MethodArgumentNotValidException.class)
