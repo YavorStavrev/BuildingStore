@@ -30,14 +30,41 @@ public class ProductController {
     }
 
     @GetMapping("/filtered")
-    public ResponseEntity<List<ProductResponseDTO>> listAll(
-            @RequestParam(required = false) String category,
+    public ResponseEntity<List<ProductResponseDTO>> listFiltered(
+            @RequestParam(name = "category", required = false) String categoryName,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean discounted,
-            @RequestParam(required = false) String q) {
+            @RequestParam(name = "q", required = false) String keyword) {
 
-        return ResponseEntity.ok(productService.listFiltered(category, minPrice, maxPrice, discounted, q));
+        return ResponseEntity.ok(productService.listFiltered(categoryName, minPrice, maxPrice, discounted, keyword));
+    }
+
+    @GetMapping("/by-category")
+    public ResponseEntity<List<ProductResponseDTO>> listByCategory(
+            @RequestParam(name = "category") String categoryName) {
+
+        return ResponseEntity.ok(productService.listFiltered(categoryName, null, null, null, null));
+    }
+
+    @GetMapping("/by-price-range")
+    public ResponseEntity<List<ProductResponseDTO>> listByPriceRange(
+            @RequestParam(name = "minPrice") BigDecimal minPrice,
+            @RequestParam(name = "maxPrice") BigDecimal maxPrice) {
+
+        return ResponseEntity.ok(productService.listFiltered(null, minPrice, maxPrice, null, null));
+    }
+
+    @GetMapping("/discounted")
+    public ResponseEntity<List<ProductResponseDTO>> listDiscounted() {
+        return ResponseEntity.ok(productService.listFiltered(null, null, null, true, null));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDTO>> searchByName(
+            @RequestParam(name = "q") String keyword) {
+
+        return ResponseEntity.ok(productService.listFiltered(null, null, null, null, keyword));
     }
 
     @PostMapping
