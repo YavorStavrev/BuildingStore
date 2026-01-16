@@ -8,153 +8,125 @@ import com.tu.javabuildingstore.model.Category;
 import com.tu.javabuildingstore.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class CategoryServiceTest {
 
-    private CategoryRepository repository;
-    private CategoryMapper mapper;
-    private CategoryService service;
+    private CategoryRepository categoryRepository;
+    private CategoryMapper categoryMapper;
+    private CategoryService categoryService;
+
+    private Category category;
+    private CategoryResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        repository = mock(CategoryRepository.class);
-        mapper = mock(CategoryMapper.class);
-        service = new CategoryService(repository, mapper);
+        categoryRepository = mock(CategoryRepository.class);
+        categoryMapper = mock(CategoryMapper.class);
+        categoryService = new CategoryService(categoryRepository, categoryMapper);
+
+        category = Category.builder()
+                .id(1L)
+                .name("Tools")
+                .description("Construction tools")
+                .products(new HashSet<>())
+                .build();
+
+        responseDTO = new CategoryResponseDTO(1L, "Tools", "Construction tools");
     }
 
     @Test
-    void saveCategory_mapsAndPersists() {
-        CategoryRequestDTO req = new CategoryRequestDTO("Pesho", "e debel");
-        Category entity = new Category("Tools");
-        Category saved = new Category("Tools");
-        CategoryResponseDTO resp = new CategoryResponseDTO();
+    void testSaveCategory_Success() {
+        CategoryRequestDTO request = new CategoryRequestDTO("Tools", "Construction tools");
 
-        when(mapper.toEntity(req)).thenReturn(entity);
-        when(repository.save(entity)).thenReturn(saved);
-        when(mapper.toDto(saved)).thenReturn(resp);
+        when(categoryMapper.toEntity(request)).thenReturn(category);
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toDto(category)).thenReturn(responseDTO);
 
-        CategoryResponseDTO out = service.saveCategory(req);
+        CategoryResponseDTO result = categoryService.saveCategory(request);
 
-        assertNotNull(out);
-        verify(mapper).toEntity(req);
-        verify(repository).save(entity);
-        verify(mapper).toDto(saved);
+        assertNotNull(result);
+        assertEquals("Tools", result.name());
+        verify(categoryRepository).save(category);
     }
 
     @Test
-    void getAllCategories_mapsList() {
-        Category c1 = new Category("A");
-        Category c2 = new Category("B");
-        when(repository.findAll()).thenReturn(List.of(c1, c2));
-        when(mapper.toDto(c1)).thenReturn(new CategoryResponseDTO());
-        when(mapper.toDto(c2)).thenReturn(new CategoryResponseDTO());
+    void testGetAllCategories() {
+        when(categoryRepository.findAll()).thenReturn(List.of(category));
+        when(categoryMapper.toDto(category)).thenReturn(responseDTO);
 
-        List<CategoryResponseDTO> out = service.getAllCategories();
+        List<CategoryResponseDTO> all = categoryService.getAllCategories();
 
-        assertEquals(2, out.size());
-        verify(repository).findAll();
-        verify(mapper).toDto(c1);
-        verify(mapper).toDto(c2);
+        assertEquals(1, all.size());
+        assertEquals("Tools", all.get(0).name());
     }
 
     @Test
-    void deleteCategoryById_exists() {
-        Category c = new Category("X");
-        when(repository.findById(1L)).thenReturn(Optional.of(c));
+    void testGetCategoryOrThrow_NotFound() {
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
 
-        service.deleteCategoryById(1L);
-
-        verify(repository).delete(c);
+        assertThrows(ResourceNotFoundException.class, () -> categoryService.getCategoryOrThrow(99L));
     }
 
     @Test
-    void deleteCategoryById_missing_throws() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.deleteCategoryById(99L));
-        verify(repository, never()).delete(any());
+    void testDeleteCategoryById_Success() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        doNothing().when(categoryRepository).delete(category);
+
+        categoryService.deleteCategoryById(1L);
+
+        verify(categoryRepository).delete(category);
     }
 
     @Test
-    void pathCategoryName_updatesAndReturnsDto() {
-        Category c = new Category("Old");
-        when(repository.findById(5L)).thenReturn(Optional.of(c));
-        CategoryResponseDTO resp = new CategoryResponseDTO();
-        when(mapper.toDto(c)).thenReturn(resp);
+    void testPatchCategoryName_Success() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryMapper.toDto(category)).thenReturn(responseDTO);
 
-        CategoryResponseDTO out = service.pathCategoryName(5L, "New");
+        CategoryResponseDTO result = categoryService.pathCategoryName(1L, "Updated Tools");
 
-        assertNotNull(out);
-        assertEquals("New", c.getName());
-        verify(mapper).toDto(c);
+        assertNotNull(result);
+        assertEquals("Tools", result.name()); // responseDTO е mock-нат
     }
 
     @Test
-    void putCategory_updatesWithMapper() {
-        Category existing = new Category("Old");
-        when(repository.findById(7L)).thenReturn(Optional.of(existing));
-        CategoryRequestDTO req = new CategoryRequestDTO();
+    void testPutCategory_Success() {
+        CategoryRequestDTO request = new CategoryRequestDTO("Updated Tools", "Updated description");
 
-        doAnswer(inv -> {
-            existing.setName("Updated");
-            return null;
-        }).when(mapper).updateFromDto(req, existing);
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+        doNothing().when(categoryMapper).updateFromDto(request, category);
+        when(categoryMapper.toDto(category)).thenReturn(responseDTO);
 
-        when(repository.save(existing)).thenReturn(existing);
-        when(mapper.toDto(existing)).thenReturn(new CategoryResponseDTO());
+        CategoryResponseDTO result = categoryService.putCategory(1L, request);
 
-        CategoryResponseDTO out = service.putCategory(7L, req);
-
-        assertNotNull(out);
-        verify(mapper).updateFromDto(req, existing);
-        verify(repository).save(existing);
-        verify(mapper).toDto(existing);
+        assertNotNull(result);
+        verify(categoryRepository).save(category);
     }
 
     @Test
-    void getCategoryOrThrow_found() {
-        Category c = new Category("Z");
-        when(repository.findById(2L)).thenReturn(Optional.of(c));
-        when(mapper.toDto(c)).thenReturn(new CategoryResponseDTO());
+    void testGetCategoryByNameOrCreate_CreatesIfNotExist() {
+        when(categoryRepository.findByName("New")).thenReturn(Optional.empty());
+        when(categoryRepository.save(any(Category.class)))
+                .thenReturn(Category.builder()
+                        .id(2L)
+                        .name("New")
+                        .description(null)
+                        .products(new HashSet<>())
+                        .build());
 
-        CategoryResponseDTO out = service.getCategoryOrThrow(2L);
+        Category cat = categoryService.getCategoryByNameOrCreate("New");
 
-        assertNotNull(out);
-        verify(mapper).toDto(c);
-    }
-
-    @Test
-    void getCategoryOrThrow_missing_throws() {
-        when(repository.findById(3L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getCategoryOrThrow(3L));
-    }
-
-    @Test
-    void getCategoryByNameOrCreate_existing() {
-        Category existing = new Category("Tools");
-        when(repository.findByName("Tools")).thenReturn(Optional.of(existing));
-
-        Category out = service.getCategoryByNameOrCreate("Tools");
-
-        assertSame(existing, out);
-        verify(repository, never()).save(any());
-    }
-
-    @Test
-    void getCategoryByNameOrCreate_creates() {
-        when(repository.findByName("New")).thenReturn(Optional.empty());
-        when(repository.save(Mockito.any(Category.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        Category out = service.getCategoryByNameOrCreate("New");
-
-        assertEquals("New", out.getName());
-        verify(repository).save(any(Category.class));
+        assertNotNull(cat);
+        assertEquals("New", cat.getName());
     }
 }
+

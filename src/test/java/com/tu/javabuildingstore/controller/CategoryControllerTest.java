@@ -1,73 +1,114 @@
 package com.tu.javabuildingstore.controller;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tu.javabuildingstore.dto.category.CategoryRequestDTO;
 import com.tu.javabuildingstore.dto.category.CategoryResponseDTO;
 import com.tu.javabuildingstore.service.CategoryService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CategoryController.class)
+@ExtendWith(MockitoExtension.class)
 class CategoryControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private CategoryService service;
+    @Mock
+    private CategoryService categoryService;
+
+    @InjectMocks
+    private CategoryController categoryController;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    private CategoryResponseDTO sampleCategory;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
+
+        sampleCategory = new CategoryResponseDTO(1L, "Tools", "Construction tools");
+    }
 
     @Test
-    void getAll_returnsOk() throws Exception {
-        when(service.getAllCategories()).thenReturn(List.of(new CategoryResponseDTO()));
+    void testGetAll() throws Exception {
+        Mockito.when(categoryService.getAllCategories()).thenReturn(List.of(sampleCategory));
+
         mockMvc.perform(get("/api/categories"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name", is("Tools")));
     }
 
     @Test
-    void getById_returnsOk() throws Exception {
-        when(service.getCategoryOrThrow(1L)).thenReturn(new CategoryResponseDTO());
+    void testGetById() throws Exception {
+        Mockito.when(categoryService.getCategoryOrThrow(1L)).thenReturn(sampleCategory);
+
         mockMvc.perform(get("/api/categories/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Tools")));
     }
 
     @Test
-    void create_returnsCreated() throws Exception {
-        when(service.saveCategory(new CategoryRequestDTO())).thenReturn(new CategoryResponseDTO());
+    void testCreateCategory() throws Exception {
+        CategoryRequestDTO request = new CategoryRequestDTO("Tools", "Construction tools");
+
+        Mockito.when(categoryService.saveCategory(any(CategoryRequestDTO.class)))
+                .thenReturn(sampleCategory);
+
         mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isCreated());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is("Tools")));
     }
 
     @Test
-    void update_returnsOk() throws Exception {
-        when(service.putCategory(1L, new CategoryRequestDTO())).thenReturn(new CategoryResponseDTO());
+    void testUpdateCategory() throws Exception {
+        CategoryRequestDTO request = new CategoryRequestDTO("Updated Tools", "Updated description");
+
+        Mockito.when(categoryService.putCategory(eq(1L), any(CategoryRequestDTO.class)))
+                .thenReturn(sampleCategory);
+
         mockMvc.perform(put("/api/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Tools")));
     }
 
     @Test
-    void patchName_returnsOk() throws Exception {
-        when(service.pathCategoryName(1L, "New")).thenReturn(new CategoryResponseDTO());
+    void testPatchName() throws Exception {
+        Mockito.when(categoryService.pathCategoryName(eq(1L), any(String.class)))
+                .thenReturn(sampleCategory);
+
         mockMvc.perform(patch("/api/categories/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("\"New\""))
-                .andExpect(status().isOk());
+                        .content("\"Updated Tools\""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Tools")));
     }
 
     @Test
-    void delete_returnsNoContent() throws Exception {
+    void testDeleteCategory() throws Exception {
+        Mockito.doNothing().when(categoryService).deleteCategoryById(1L);
+
         mockMvc.perform(delete("/api/categories/1"))
                 .andExpect(status().isNoContent());
     }
