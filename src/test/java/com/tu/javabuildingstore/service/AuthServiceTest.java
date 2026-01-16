@@ -1,22 +1,24 @@
-package com.training.building_store.service;
+package com.tu.javabuildingstore.service;
 
-import com.training.building_store.config.JwtProvider;
-import com.training.building_store.dto.user.AuthResponseDTO;
-import com.training.building_store.dto.user.LoginRequestDTO;
-import com.training.building_store.dto.user.RegisterRequestDTO;
-import com.training.building_store.dto.user.RegisterResponseDTO;
-import com.training.building_store.mapper.UserMapper;
-import com.training.building_store.model.User;
-import com.training.building_store.repository.UserRepository;
+import com.tu.javabuildingstore.config.JwtProvider;
+import com.tu.javabuildingstore.dto.user.AuthResponseDTO;
+import com.tu.javabuildingstore.dto.user.LoginRequestDTO;
+import com.tu.javabuildingstore.dto.user.RegisterRequestDTO;
+import com.tu.javabuildingstore.dto.user.RegisterResponseDTO;
+import com.tu.javabuildingstore.mapper.UserMapper;
+import com.tu.javabuildingstore.model.User;
+import com.tu.javabuildingstore.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AuthServiceTest {
 
@@ -50,6 +52,12 @@ class AuthServiceTest {
         );
 
         loginRequest = new LoginRequestDTO("john", "Password1");
+
+        // Ensure mocked mapper returns non-null responses for conflict branches
+        when(userMapper.toResponse(null, "Username already in use"))
+                .thenReturn(new RegisterResponseDTO(null, null, null, "Username already in use", null));
+        when(userMapper.toResponse(null, "Email already in use"))
+                .thenReturn(new RegisterResponseDTO(null, null, null, "Email already in use", null));
     }
 
     @Test
@@ -75,6 +83,7 @@ class AuthServiceTest {
 
         RegisterResponseDTO response = authService.register(registerRequest);
 
+        assertNotNull(response);
         assertEquals("Username already in use", response.message());
         assertNull(response.token());
     }
@@ -86,6 +95,7 @@ class AuthServiceTest {
 
         RegisterResponseDTO response = authService.register(registerRequest);
 
+        assertNotNull(response);
         assertEquals("Email already in use", response.message());
         assertNull(response.token());
     }

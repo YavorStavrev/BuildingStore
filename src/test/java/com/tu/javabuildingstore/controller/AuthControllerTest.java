@@ -1,11 +1,11 @@
-package com.training.building_store.controller;
+package com.tu.javabuildingstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.training.building_store.dto.user.AuthResponseDTO;
-import com.training.building_store.dto.user.LoginRequestDTO;
-import com.training.building_store.dto.user.RegisterRequestDTO;
-import com.training.building_store.dto.user.RegisterResponseDTO;
-import com.training.building_store.service.AuthService;
+import com.tu.javabuildingstore.dto.user.AuthResponseDTO;
+import com.tu.javabuildingstore.dto.user.LoginRequestDTO;
+import com.tu.javabuildingstore.dto.user.RegisterRequestDTO;
+import com.tu.javabuildingstore.dto.user.RegisterResponseDTO;
+import com.tu.javabuildingstore.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {

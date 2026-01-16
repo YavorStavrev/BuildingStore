@@ -1,8 +1,8 @@
-package com.training.building_store.service;
+package com.tu.javabuildingstore.service;
 
-import com.training.building_store.model.Role;
-import com.training.building_store.model.User;
-import com.training.building_store.repository.UserRepository;
+import com.tu.javabuildingstore.model.Role;
+import com.tu.javabuildingstore.model.User;
+import com.tu.javabuildingstore.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,11 +1,11 @@
-package com.training.building_store.controller;
+package com.tu.javabuildingstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.training.building_store.dto.order.OrderRequestDTO;
-import com.training.building_store.dto.order.OrderResponseDTO;
-import com.training.building_store.dto.orderItem.OrderItemRequestDTO;
-import com.training.building_store.model.enums.OrderStatus;
-import com.training.building_store.service.OrderService;
+import com.tu.javabuildingstore.dto.order.OrderRequestDTO;
+import com.tu.javabuildingstore.dto.order.OrderResponseDTO;
+import com.tu.javabuildingstore.dto.orderItem.OrderItemRequestDTO;
+import com.tu.javabuildingstore.model.enums.OrderStatus;
+import com.tu.javabuildingstore.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class OrderControllerTest {

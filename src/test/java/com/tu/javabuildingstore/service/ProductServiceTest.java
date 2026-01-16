@@ -1,22 +1,27 @@
-package com.training.building_store.service;
+package com.tu.javabuildingstore.service;
 
-import com.training.building_store.dto.product.*;
-import com.training.building_store.exception.ResourceNotFoundException;
-import com.training.building_store.mapper.ProductMapper;
-import com.training.building_store.model.Category;
-import com.training.building_store.model.Product;
-import com.training.building_store.repository.CategoryRepository;
-import com.training.building_store.repository.ProductRepository;
+import com.tu.javabuildingstore.dto.product.ProductPriceUpdateDTO;
+import com.tu.javabuildingstore.dto.product.ProductRequestDTO;
+import com.tu.javabuildingstore.dto.product.ProductResponseDTO;
+import com.tu.javabuildingstore.exception.ResourceNotFoundException;
+import com.tu.javabuildingstore.mapper.ProductMapper;
+import com.tu.javabuildingstore.model.Category;
+import com.tu.javabuildingstore.model.Product;
+import com.tu.javabuildingstore.repository.CategoryRepository;
+import com.tu.javabuildingstore.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ProductServiceTest {
 

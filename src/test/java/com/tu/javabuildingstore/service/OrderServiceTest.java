@@ -1,15 +1,17 @@
-package com.training.building_store.service;
+package com.tu.javabuildingstore.service;
 
-import com.training.building_store.dto.order.OrderRequestDTO;
-import com.training.building_store.dto.order.OrderResponseDTO;
-import com.training.building_store.dto.orderItem.OrderItemRequestDTO;
-import com.training.building_store.exception.ResourceNotFoundException;
-import com.training.building_store.mapper.OrderMapper;
-import com.training.building_store.model.*;
-import com.training.building_store.model.enums.OrderStatus;
-import com.training.building_store.repository.OrderRepository;
-import com.training.building_store.repository.ProductRepository;
-import com.training.building_store.repository.UserRepository;
+import com.tu.javabuildingstore.dto.order.OrderRequestDTO;
+import com.tu.javabuildingstore.dto.order.OrderResponseDTO;
+import com.tu.javabuildingstore.dto.orderItem.OrderItemRequestDTO;
+import com.tu.javabuildingstore.exception.ResourceNotFoundException;
+import com.tu.javabuildingstore.mapper.OrderMapper;
+import com.tu.javabuildingstore.model.Order;
+import com.tu.javabuildingstore.model.Product;
+import com.tu.javabuildingstore.model.User;
+import com.tu.javabuildingstore.model.enums.OrderStatus;
+import com.tu.javabuildingstore.repository.OrderRepository;
+import com.tu.javabuildingstore.repository.ProductRepository;
+import com.tu.javabuildingstore.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -19,8 +21,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class OrderServiceTest {
 

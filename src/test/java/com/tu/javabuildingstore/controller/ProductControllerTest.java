@@ -1,42 +1,52 @@
-package com.training.building_store.controller;
+package com.tu.javabuildingstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.training.building_store.dto.product.*;
-import com.training.building_store.service.ProductService;
+import com.tu.javabuildingstore.dto.product.ProductRequestDTO;
+import com.tu.javabuildingstore.dto.product.ProductPriceUpdateDTO;
+import com.tu.javabuildingstore.dto.product.ProductDiscountUpdateDTO;
+import com.tu.javabuildingstore.dto.product.ProductQuantityUpdateDTO;
+import com.tu.javabuildingstore.dto.product.ProductResponseDTO;
+import com.tu.javabuildingstore.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ProductController.class)
+@ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-//    @MockBean
+    @Mock
     private ProductService productService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private ProductController productController;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private ProductResponseDTO sampleProduct;
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+
         sampleProduct = new ProductResponseDTO(
                 1L,
                 "Hammer",
